@@ -7,7 +7,7 @@
 // since Tuesday. Concrete numbers, one vivid twist, deadpan tone.
 //
 // Run: node main.ts   (Node 22.18+ runs TypeScript as-is)
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const ENTRY =
   "In Brackenmoor, expect a high of 19 degrees, light rain, and one cloud that has been following the mayor since Tuesday.";
@@ -28,3 +28,15 @@ if (ENTRY.includes("\n")) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", ENTRY, "utf8");
+
+// Verify what was actually written: the gate reads the file, not the
+// constant, so the run fails loudly instead of shipping a wrong file.
+const written = readFileSync("/output/entry.txt", "utf8");
+if (written !== ENTRY) {
+  throw new Error("entry.txt does not match the intended line");
+}
+if (written.length < 1 || written.length > 160) {
+  throw new Error(
+    `written entry is ${written.length} characters, outside the 1-160 gate`,
+  );
+}
